@@ -1,4 +1,4 @@
-# mew.js.cool
+## Make Tools That Will Make Your Life Easier
 
 [String Tools](/string-tools)
 
