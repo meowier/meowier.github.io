@@ -1,4 +1,4 @@
-# meowier.github.io
+# mew.js.cool
 
 [String Tools](/string-tools)
 
