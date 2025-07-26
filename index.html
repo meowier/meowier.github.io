@@ -3,136 +3,348 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MewJS</title>
+    <title>MewJS // Hacker Portal</title>
     <link rel="shortcut icon" href="favicon.ico">
-    <link href="https://unpkg.com/nes.css@2.3.0/css/nes.min.css" rel="stylesheet" />
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Mono:wght@400;700&display=swap');
+
+        html,
+        body {
+            background: #000;
+            color: #39ff14;
+            font-family: 'Fira Mono', 'Consolas', 'Menlo', 'Monaco', monospace;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            width: 100vw;
+            font-size: 18px;
+            cursor: url('https://unpkg.com/nes.css@2.3.0/assets/cursor.png'), auto;
+        }
+
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background: #000 url('https://www.transparenttextures.com/patterns/cubes.png');
+            background-blend-mode: multiply;
+        }
+
+        .terminal {
+            background: rgba(10, 10, 10, 0.98);
+            border-radius: 10px;
+            box-shadow: 0 0 40px #39ff14cc;
+            padding: 2.5em 2em 2em 2em;
+            max-width: 700px;
+            width: 100%;
+            border: 2px solid #39ff14;
+            position: relative;
+            overflow: hidden;
+            animation: flickerBG 2.5s infinite alternate;
+        }
+
+        @keyframes flickerBG {
+            0% {
+                box-shadow: 0 0 40px #39ff14cc;
+            }
+
+            50% {
+                box-shadow: 0 0 60px #39ff14cc, 0 0 10px #39ff1444;
+            }
+
+            100% {
+                box-shadow: 0 0 40px #39ff14cc;
+            }
+        }
+
+        .terminal-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5em;
+            margin-bottom: 1.5em;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .dot.red {
+            background: #ff3860;
+        }
+
+        .dot.yellow {
+            background: #ffdd57;
+        }
+
+        .dot.green {
+            background: #23d160;
+        }
+
+        .terminal-title {
+            margin-left: 1em;
+            font-weight: bold;
+            letter-spacing: 2px;
+            color: #39ff14;
+            font-size: 1.2em;
+            text-shadow: 0 0 8px #39ff14cc;
+        }
+
+        h1,
+        h2,
+        h3 {
+            color: #39ff14;
+            font-family: inherit;
+            margin: 0 0 1em 0;
+            text-shadow: 0 0 8px #39ff14cc;
+        }
+
+        ul.tools {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        ul.tools li {
+            margin: 0 0 1.2em 0;
+            position: relative;
+            transition: background 0.2s;
+        }
+
+        ul.tools li:hover {
+            background: rgba(57, 255, 20, 0.08);
+        }
+
+        ul.tools a {
+            color: #39ff14;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.1em;
+            letter-spacing: 1px;
+            transition: color 0.2s, text-shadow 0.2s;
+            text-shadow: 0 0 5px #39ff14cc;
+            position: relative;
+        }
+
+        ul.tools a:hover {
+            color: #fff;
+            text-shadow: 0 0 10px #39ff14, 0 0 20px #39ff14;
+        }
+
+        .prompt {
+            color: #39ff14;
+            font-weight: bold;
+            margin-right: 0.5em;
+            display: inline-block;
+            animation: prompt-blink 1.1s steps(1) infinite;
+        }
+
+        @keyframes prompt-blink {
+
+            0%,
+            49% {
+                opacity: 1;
+            }
+
+            50%,
+            100% {
+                opacity: 0.3;
+            }
+        }
+
+        .ascii {
+            font-size: 1.1em;
+            color: #39ff14;
+            margin-bottom: 1.5em;
+            white-space: pre;
+            text-shadow: 0 0 8px #39ff14cc;
+            animation: ascii-flicker 2.5s infinite alternate;
+        }
+
+        @keyframes ascii-flicker {
+            0% {
+                opacity: 1;
+                text-shadow: 0 0 8px #39ff14cc;
+            }
+
+            50% {
+                opacity: 0.85;
+                text-shadow: 0 0 16px #39ff14cc, 0 0 2px #39ff1444;
+            }
+
+            100% {
+                opacity: 1;
+                text-shadow: 0 0 8px #39ff14cc;
+            }
+        }
+
+        /* Glitch effect for title */
+        .terminal-title {
+            position: relative;
+        }
+
+        .terminal-title::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            pointer-events: none;
+            background: repeating-linear-gradient(180deg, transparent 0 2px, #39ff1422 2px 4px);
+            opacity: 0.2;
+        }
+
+        /* Custom cursor for links */
+        a,
+        .prompt {
+            cursor: url('https://unpkg.com/nes.css@2.3.0/assets/cursor-click.png'), pointer;
+        }
+
+        @media (max-width: 800px) {
+            .terminal {
+                max-width: 98vw;
+                padding: 1em;
+            }
+        }
+    </style>
 </head>
-<style>
-    /* cyrillic-ext */
-@font-face {
-  font-family: 'Press Start 2P';
-  font-style: normal;
-  font-weight: 400;
-  src: url(https://fonts.gstatic.com/s/pressstart2p/v15/e3t4euO8T-267oIAQAu6jDQyK3nYivN04w.woff2) format('woff2');
-  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
-}
-/* cyrillic */
-@font-face {
-  font-family: 'Press Start 2P';
-  font-style: normal;
-  font-weight: 400;
-  src: url(https://fonts.gstatic.com/s/pressstart2p/v15/e3t4euO8T-267oIAQAu6jDQyK3nRivN04w.woff2) format('woff2');
-  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
-}
-/* greek */
-@font-face {
-  font-family: 'Press Start 2P';
-  font-style: normal;
-  font-weight: 400;
-  src: url(https://fonts.gstatic.com/s/pressstart2p/v15/e3t4euO8T-267oIAQAu6jDQyK3nWivN04w.woff2) format('woff2');
-  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
-}
-/* latin-ext */
-@font-face {
-  font-family: 'Press Start 2P';
-  font-style: normal;
-  font-weight: 400;
-  src: url(https://fonts.gstatic.com/s/pressstart2p/v15/e3t4euO8T-267oIAQAu6jDQyK3nbivN04w.woff2) format('woff2');
-  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
-}
-/* latin */
-@font-face {
-  font-family: 'Press Start 2P';
-  font-style: normal;
-  font-weight: 400;
-  src: url(https://fonts.gstatic.com/s/pressstart2p/v15/e3t4euO8T-267oIAQAu6jDQyK3nVivM.woff2) format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-    #main {
-        margin: 0 auto;
-        margin-top: 150px;
-        max-width: 75%;
-    }
 
-    a>span {
-        font-size: 1.2em;
-    }
-
-    .title {
-        font-size: 1.5em !important;
-    }
-</style>
-
-<body style="zoom: 50%">
-    <div id="main">
-        <section class="nes-container with-title">
-            <h2 class="title">Make Tools That Will Make Your Life Easier</h2>
-            <div id="texts" class="item">
-                <div class="lists">
-                    <ul class="nes-list is-disc">
-                        <li>
-                            <article class="article-link">
-                                <h3 class="title"><a href="https://burpsuite.pages.dev"><i class="nes-mario"></i> <span>BurpSuite Keygen</span> <i class="nes-mario"></i></a></h3>
-                            </article>
-                        </li>
-                        <li>
-                            <article class="article-link">
-                                <h3 class="title"><a href="/json-editor"><i class="nes-ash"></i> <span>JSON Editor</span> <i class="nes-ash"></i></a></h3>
-                            </article>
-                        </li>
-                        <li>
-                            <article class="article-link">
-                                <h3 class="title"><a href="/string-tools"><i class="nes-pokeball"></i> <span>String Tools</span> <i class="nes-pokeball"></i></a></h3>
-                            </article>
-                        </li>
-                        <li>
-                            <article class="article-link">
-                                <h3 class="title"><a href="/video"><i class="nes-bulbasaur"></i> <span>Video Online</span> <i class="nes-bulbasaur"></i></a></h3>
-                            </article>
-                        </li>
-                        <li>
-                            <article class="article-link">
-                                <h3 class="title"><a href="/python-playground"><i class="nes-squirtle"></i> <span>Python Playground</span> <i class="nes-squirtle"></i></a></h3>
-                            </article>
-                        </li>
-                        <li>
-                            <article class="article-link">
-                                <h3 class="title"><a href="/upload"><i class="nes-kirby"></i> <span>Upload Imgur</span> <i class="nes-kirby"></i></a></h3>
-                            </article>
-                        </li>
-                        <li>
-                            <article class="article-link">
-                                <h3 class="title"><a href="/CyberChef"><i class="nes-charmander"></i> <span>CyberChef</span> <i class="nes-charmander"></i></a></h3>
-                            </article>
-                        </li>
-                        <li>
-                            <article class="article-link">
-                                <h3 class="title"><a href="/qrcode"><i class="nes-squirtle"></i> <span>QR Code</span> <i class="nes-squirtle"></i></a></h3>
-                            </article>
-                        </li>
-                        <li>
-                            <article class="article-link">
-                                <h3 class="title"><a href="/DownGit"><i class="nes-ash"></i> <span>DownGit</span> <i class="nes-ash"></i></a></h3>
-                            </article>
-                        </li>
-                         <li>
-                            <article class="article-link">
-                                <h3 class="title"><a href="/reverse-shell-generator"><i class="nes-mario"></i> <span>Reverse Shell Generator</span> <i class="nes-mario"></i></a></h3>
-                            </article>
-                        </li>
-                        <li>
-                            <article class="article-link">
-                                <h3 class="title"><a href="/runtime-exec.html"><i class="nes-pokeball"></i> <span>Runtime Exec</span> <i class="nes-pokeball"></i></a></h3>
-                            </article>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-
-        </section>
+<body>
+    <canvas id="matrix-bg"></canvas>
+    <div class="terminal">
+        <div class="terminal-header">
+            <span class="dot red"></span>
+            <span class="dot yellow"></span>
+            <span class="dot green"></span>
+            <span class="terminal-title">MewJS // Hacker Portal</span>
+        </div>
+        <div class="ascii" id="ascii-art">
+            { MewJS }
+            // Make Tools That Will Make Your Life Easier
+        </div>
+        <h2>Available Tools</h2>
+        <ul class="tools">
+            <li><span class="prompt">$</span><a href="https://burpsuite.pages.dev">BurpSuite Keygen</a></li>
+            <li><span class="prompt">$</span><a href="/json-editor">JSON Editor</a></li>
+            <li><span class="prompt">$</span><a href="/image-metadata-remover">Image Metadata Remover</a></li>
+            <li><span class="prompt">$</span><a href="/string-tools">String Tools</a></li>
+            <li><span class="prompt">$</span><a href="/video">Video Online</a></li>
+            <li><span class="prompt">$</span><a href="/python-playground">Python Playground</a></li>
+            <li><span class="prompt">$</span><a href="/upload">Upload Imgur</a></li>
+            <li><span class="prompt">$</span><a href="/CyberChef">CyberChef</a></li>
+            <li><span class="prompt">$</span><a href="/qrcode">QR Code</a></li>
+            <li><span class="prompt">$</span><a href="/DownGit">DownGit</a></li>
+            <li><span class="prompt">$</span><a href="/reverse-shell-generator">Reverse Shell Generator</a></li>
+            <li><span class="prompt">$</span><a href="/runtime-exec.html">Runtime Exec</a></li>
+        </ul>
+        <div style="margin-top:2em; color:#39ff14; font-size:0.9em; opacity:0.7; text-align:right;">
+            &lt;hacked by mew.js.cool&gt;
+        </div>
     </div>
+    <script>
+        // Matrix-style binary rain background
+        const canvas = document.getElementById('matrix-bg');
+        const ctx = canvas.getContext('2d');
+        let w = window.innerWidth;
+        let h = window.innerHeight;
+        canvas.width = w;
+        canvas.height = h;
+        let fontSize = 20;
+        let columns = Math.floor(w / fontSize);
+        let drops = Array(columns).fill(1);
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(0,0,0,0.13)';
+            ctx.fillRect(0, 0, w, h);
+            ctx.font = fontSize + "px 'Fira Mono', monospace";
+            for (let i = 0; i < drops.length; i++) {
+                let text = Math.random() > 0.5 ? '1' : '0';
+                ctx.fillStyle = '#39ff14';
+                ctx.shadowColor = '#39ff14';
+                ctx.shadowBlur = 8;
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                ctx.shadowBlur = 0;
+                if (Math.random() > 0.975) drops[i] = 0;
+                drops[i]++;
+                if (drops[i] * fontSize > h) drops[i] = 0;
+            }
+        }
+        setInterval(drawMatrix, 50);
+        window.addEventListener('resize', () => {
+            w = window.innerWidth;
+            h = window.innerHeight;
+            canvas.width = w;
+            canvas.height = h;
+            columns = Math.floor(w / fontSize);
+            drops = Array(columns).fill(1);
+        });
+
+        // Make sure canvas stays behind everything
+        canvas.style.position = 'fixed';
+        canvas.style.left = '0';
+        canvas.style.top = '0';
+        canvas.style.width = '100vw';
+        canvas.style.height = '100vh';
+        canvas.style.zIndex = '0';
+
+        // Terminal flicker effect for ascii art
+        // Terminal flicker effect for ascii art
+        const ascii = document.getElementById('ascii-art');
+        function flicker() {
+            if (!ascii) return;
+            ascii.style.opacity = 0.95 + Math.random() * 0.05;
+            ascii.style.textShadow = `0 0 ${8 + Math.random() * 8}px #39ff14cc`;
+        }
+        setInterval(flicker, 120);
+
+        // Animated prompt typing effect
+        document.querySelectorAll('.tools li').forEach((li, idx) => {
+            const prompt = li.querySelector('.prompt');
+            if (prompt) {
+                prompt.innerHTML = '';
+                let chars = '$';
+                let i = 0;
+                setTimeout(function typePrompt() {
+                    prompt.innerHTML = chars.slice(0, i + 1) + '<span class="cursor-blink">█</span>';
+                    i++;
+                    if (i < chars.length) setTimeout(typePrompt, 80 + Math.random() * 60);
+                    else setTimeout(() => { prompt.innerHTML = '$<span class="cursor-blink">█</span>'; }, 200);
+                }, 200 + idx * 60);
+            }
+        });
+
+        // Blinking cursor effect
+        const style = document.createElement('style');
+        style.innerHTML = `.cursor-blink { display:inline-block; animation: blink-cursor 1s steps(1) infinite; }
+    @keyframes blink-cursor { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }`;
+        document.head.appendChild(style);
+
+        // Mouse trail effect
+        let trail = [];
+        document.addEventListener('mousemove', function (e) {
+            const dot = document.createElement('div');
+            dot.style.position = 'fixed';
+            dot.style.left = (e.clientX - 2) + 'px';
+            dot.style.top = (e.clientY - 2) + 'px';
+            dot.style.width = '6px';
+            dot.style.height = '6px';
+            dot.style.borderRadius = '50%';
+            dot.style.background = '#39ff14';
+            dot.style.opacity = '0.18';
+            dot.style.pointerEvents = 'none';
+            dot.style.zIndex = 9999;
+            document.body.appendChild(dot);
+            trail.push(dot);
+            if (trail.length > 24) {
+                let old = trail.shift();
+                if (old) old.remove();
+            }
+            setTimeout(() => dot.remove(), 600);
+        });
+    </script>
 </body>
 
 </html>
