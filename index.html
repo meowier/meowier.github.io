@@ -15,17 +15,17 @@
 
         html, body {
             width: 100%;
-            height: 100%;
+            min-height: 100%;
             overflow-x: hidden;
         }
 
         body {
             background: radial-gradient(ellipse at center, #0a0e27 0%, #000000 100%);
+            background-attachment: fixed;
             color: #00ffff;
             font-family: 'Orbitron', monospace;
             position: relative;
             cursor: none;
-            min-height: 100vh;
         }
 
         /* Custom Alien Cursor */
@@ -35,7 +35,11 @@
             height: 30px;
             pointer-events: none;
             z-index: 10000;
-            transition: transform 0.1s ease;
+            transition: transform 0.2s ease;
+        }
+
+        #cursor.hover {
+            transform: scale(1.8);
         }
 
         #cursor-glow {
@@ -44,6 +48,11 @@
             height: 100%;
             background: radial-gradient(circle, #00ffff 0%, transparent 70%);
             animation: pulse-glow 2s infinite;
+            transition: all 0.2s ease;
+        }
+
+        #cursor.hover #cursor-glow {
+            background: radial-gradient(circle, #ff00ff 0%, #00ffff 50%, transparent 70%);
         }
 
         #cursor-core {
@@ -56,11 +65,45 @@
             background: #00ffff;
             border-radius: 50%;
             box-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff, 0 0 30px #00ffff;
+            transition: all 0.2s ease;
+        }
+
+        #cursor.hover #cursor-core {
+            background: #ff00ff;
+            box-shadow: 0 0 15px #ff00ff, 0 0 30px #ff00ff, 0 0 45px #ff00ff;
+            width: 12px;
+            height: 12px;
+        }
+
+        #cursor-ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 24px;
+            height: 24px;
+            border: 2px solid #00ffff;
+            border-radius: 50%;
+            opacity: 0;
+            transition: all 0.2s ease;
+        }
+
+        #cursor.hover #cursor-ring {
+            opacity: 1;
+            width: 35px;
+            height: 35px;
+            border-color: #ff00ff;
+            animation: ring-pulse 1s infinite;
         }
 
         @keyframes pulse-glow {
             0%, 100% { opacity: 0.6; transform: scale(1); }
             50% { opacity: 1; transform: scale(1.5); }
+        }
+
+        @keyframes ring-pulse {
+            0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1.3); opacity: 0; }
         }
 
         /* Stars Background */
@@ -382,6 +425,7 @@
     <!-- Custom Cursor -->
     <div id="cursor">
         <div id="cursor-glow"></div>
+        <div id="cursor-ring"></div>
         <div id="cursor-core"></div>
     </div>
 
@@ -447,25 +491,18 @@
         document.addEventListener('mousemove', (e) => {
             mouseX = e.clientX;
             mouseY = e.clientY;
+            cursor.style.left = mouseX + 'px';
+            cursor.style.top = mouseY + 'px';
         });
-
-        function animateCursor() {
-            cursorX += (mouseX - cursorX) * 0.15;
-            cursorY += (mouseY - cursorY) * 0.15;
-            cursor.style.left = cursorX + 'px';
-            cursor.style.top = cursorY + 'px';
-            requestAnimationFrame(animateCursor);
-        }
-        animateCursor();
 
         // Cursor hover effect
         const links = document.querySelectorAll('a, .tools li');
         links.forEach(link => {
             link.addEventListener('mouseenter', () => {
-                cursor.style.transform = 'scale(1.5)';
+                cursor.classList.add('hover');
             });
             link.addEventListener('mouseleave', () => {
-                cursor.style.transform = 'scale(1)';
+                cursor.classList.remove('hover');
             });
         });
 
