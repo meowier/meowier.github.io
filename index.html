@@ -1,350 +1,548 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MewJS</title>
-    <link rel="shortcut icon" href="favicon.ico">
+    <title>MewJS - Alien Portal</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Fira+Mono:wght@400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
 
-        html,
-        body {
-            background: #000;
-            color: #39ff14;
-            font-family: 'Fira Mono', 'Consolas', 'Menlo', 'Monaco', monospace;
+        * {
             margin: 0;
             padding: 0;
-            min-height: 100vh;
-            width: 100vw;
-            font-size: 18px;
-            cursor: url('https://unpkg.com/nes.css@2.3.0/assets/cursor.png'), auto;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow-x: hidden;
         }
 
         body {
+            background: radial-gradient(ellipse at center, #0a0e27 0%, #000000 100%);
+            color: #00ffff;
+            font-family: 'Orbitron', monospace;
+            position: relative;
+            cursor: none;
+            min-height: 100vh;
+        }
+
+        /* Custom Alien Cursor */
+        #cursor {
+            position: fixed;
+            width: 30px;
+            height: 30px;
+            pointer-events: none;
+            z-index: 10000;
+            transition: transform 0.1s ease;
+        }
+
+        #cursor-glow {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, #00ffff 0%, transparent 70%);
+            animation: pulse-glow 2s infinite;
+        }
+
+        #cursor-core {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 8px;
+            height: 8px;
+            background: #00ffff;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff, 0 0 30px #00ffff;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { opacity: 0.6; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.5); }
+        }
+
+        /* Stars Background */
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 3s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        /* UFO Flying Animation */
+        #ufo {
+            position: fixed;
+            width: 80px;
+            height: 40px;
+            z-index: 2;
+            animation: fly-across 20s linear infinite;
+            opacity: 0;
+        }
+
+        @keyframes fly-across {
+            0% { left: -100px; top: 10%; opacity: 0; }
+            5% { opacity: 0.8; }
+            95% { opacity: 0.8; }
+            100% { left: 110%; top: 30%; opacity: 0; }
+        }
+
+        .ufo-body {
+            width: 80px;
+            height: 25px;
+            background: linear-gradient(180deg, #a0a0a0 0%, #606060 100%);
+            border-radius: 50% 50% 50% 50% / 80% 80% 20% 20%;
+            position: relative;
+            box-shadow: 0 0 20px #00ffff;
+        }
+
+        .ufo-dome {
+            width: 35px;
+            height: 20px;
+            background: radial-gradient(circle, rgba(0,255,255,0.4) 0%, rgba(0,100,100,0.6) 100%);
+            border-radius: 50% 50% 0 0;
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 2px solid #00ffff;
+        }
+
+        .ufo-light {
+            position: absolute;
+            bottom: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 40px solid transparent;
+            border-right: 40px solid transparent;
+            border-top: 30px solid rgba(0, 255, 255, 0.3);
+            animation: beam-pulse 1s infinite;
+        }
+
+        @keyframes beam-pulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.7; }
+        }
+
+        /* Main Container */
+        .container {
+            position: relative;
+            z-index: 10;
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 100vh;
-            background: #000 url('https://www.transparenttextures.com/patterns/cubes.png');
-            background-blend-mode: multiply;
+            min-height: 100vh;
+            padding: 2rem;
         }
 
-        .terminal {
-            background: rgba(10, 10, 10, 0.98);
-            border-radius: 10px;
-            box-shadow: 0 0 40px #39ff14cc;
-            padding: 2.5em 2em 2em 2em;
-            max-width: 700px;
+        .portal {
+            background: linear-gradient(135deg, rgba(10, 14, 39, 0.95) 0%, rgba(0, 20, 40, 0.95) 100%);
+            border: 3px solid #00ffff;
+            border-radius: 20px;
+            padding: 3rem 2.5rem;
+            max-width: 800px;
             width: 100%;
-            border: 2px solid #39ff14;
+            box-shadow: 
+                0 0 40px rgba(0, 255, 255, 0.3),
+                0 0 80px rgba(0, 255, 255, 0.2),
+                inset 0 0 60px rgba(0, 255, 255, 0.05);
             position: relative;
-            overflow: hidden;
-            animation: flickerBG 2.5s infinite alternate;
+            animation: portal-float 6s ease-in-out infinite;
         }
 
-        @keyframes flickerBG {
-            0% {
-                box-shadow: 0 0 40px #39ff14cc;
-            }
-
-            50% {
-                box-shadow: 0 0 60px #39ff14cc, 0 0 10px #39ff1444;
-            }
-
-            100% {
-                box-shadow: 0 0 40px #39ff14cc;
-            }
+        @keyframes portal-float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
         }
 
-        .terminal-header {
-            display: flex;
-            align-items: center;
-            gap: 0.5em;
-            margin-bottom: 1.5em;
-        }
-
-        .dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            display: inline-block;
-        }
-
-        .dot.red {
-            background: #ff3860;
-        }
-
-        .dot.yellow {
-            background: #ffdd57;
-        }
-
-        .dot.green {
-            background: #23d160;
-        }
-
-        .terminal-title {
-            margin-left: 1em;
-            font-weight: bold;
-            letter-spacing: 2px;
-            color: #39ff14;
-            font-size: 1.2em;
-            text-shadow: 0 0 8px #39ff14cc;
-        }
-
-        h1,
-        h2,
-        h3 {
-            color: #39ff14;
-            font-family: inherit;
-            margin: 0 0 1em 0;
-            text-shadow: 0 0 8px #39ff14cc;
-        }
-
-        ul.tools {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        ul.tools li {
-            margin: 0 0 1.2em 0;
-            position: relative;
-            transition: background 0.2s;
-        }
-
-        ul.tools li:hover {
-            background: rgba(57, 255, 20, 0.08);
-        }
-
-        ul.tools a {
-            color: #39ff14;
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 1.1em;
-            letter-spacing: 1px;
-            transition: color 0.2s, text-shadow 0.2s;
-            text-shadow: 0 0 5px #39ff14cc;
-            position: relative;
-        }
-
-        ul.tools a:hover {
-            color: #fff;
-            text-shadow: 0 0 10px #39ff14, 0 0 20px #39ff14;
-        }
-
-        .prompt {
-            color: #39ff14;
-            font-weight: bold;
-            margin-right: 0.5em;
-            display: inline-block;
-            animation: prompt-blink 1.1s steps(1) infinite;
-        }
-
-        @keyframes prompt-blink {
-
-            0%,
-            49% {
-                opacity: 1;
-            }
-
-            50%,
-            100% {
-                opacity: 0.3;
-            }
-        }
-
-        .ascii {
-            font-size: 1.1em;
-            color: #39ff14;
-            margin-bottom: 1.5em;
-            white-space: pre;
-            text-shadow: 0 0 8px #39ff14cc;
-            animation: ascii-flicker 2.5s infinite alternate;
-        }
-
-        @keyframes ascii-flicker {
-            0% {
-                opacity: 1;
-                text-shadow: 0 0 8px #39ff14cc;
-            }
-
-            50% {
-                opacity: 0.85;
-                text-shadow: 0 0 16px #39ff14cc, 0 0 2px #39ff1444;
-            }
-
-            100% {
-                opacity: 1;
-                text-shadow: 0 0 8px #39ff14cc;
-            }
-        }
-
-        /* Glitch effect for title */
-        .terminal-title {
-            position: relative;
-        }
-
-        .terminal-title::after {
-            content: '';
+        /* Corner Decorations */
+        .corner {
             position: absolute;
-            left: 0;
-            right: 0;
-            top: 0;
-            bottom: 0;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #00ffff;
+        }
+
+        .corner-tl { top: -3px; left: -3px; border-right: none; border-bottom: none; }
+        .corner-tr { top: -3px; right: -3px; border-left: none; border-bottom: none; }
+        .corner-bl { bottom: -3px; left: -3px; border-right: none; border-top: none; }
+        .corner-br { bottom: -3px; right: -3px; border-left: none; border-top: none; }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .alien-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            display: inline-block;
+            animation: alien-bob 3s ease-in-out infinite;
+            filter: drop-shadow(0 0 20px #00ffff);
+        }
+
+        @keyframes alien-bob {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            25% { transform: translateY(-10px) rotate(-5deg); }
+            75% { transform: translateY(-5px) rotate(5deg); }
+        }
+
+        h1 {
+            color: #00ffff;
+            font-size: 2.5rem;
+            font-weight: 900;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+            text-shadow: 
+                0 0 10px #00ffff,
+                0 0 20px #00ffff,
+                0 0 30px #00ffff,
+                0 0 40px #00ffff;
+            animation: title-glitch 5s infinite;
+        }
+
+        @keyframes title-glitch {
+            0%, 90%, 100% { transform: translateX(0); }
+            92% { transform: translateX(-2px); }
+            94% { transform: translateX(2px); }
+            96% { transform: translateX(-2px); }
+            98% { transform: translateX(2px); }
+        }
+
+        .subtitle {
+            color: #00ffaa;
+            font-size: 1rem;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px #00ffaa;
+        }
+
+        h2 {
+            color: #00ffff;
+            font-size: 1.5rem;
+            margin: 2rem 0 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            text-shadow: 0 0 15px #00ffff;
+            border-bottom: 2px solid rgba(0, 255, 255, 0.3);
+            padding-bottom: 0.5rem;
+        }
+
+        /* Tools List */
+        .tools {
+            list-style: none;
+        }
+
+        .tools li {
+            margin-bottom: 1rem;
+            position: relative;
+            padding: 1rem 1.5rem;
+            background: linear-gradient(90deg, rgba(0, 255, 255, 0.05) 0%, transparent 100%);
+            border-left: 3px solid transparent;
+            transition: all 0.3s ease;
+            border-radius: 5px;
+        }
+
+        .tools li:hover {
+            background: linear-gradient(90deg, rgba(0, 255, 255, 0.15) 0%, rgba(0, 255, 255, 0.05) 100%);
+            border-left-color: #00ffff;
+            transform: translateX(10px);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+        }
+
+        .tools li::before {
+            content: '▶';
+            color: #00ffff;
+            margin-right: 1rem;
+            font-size: 0.8rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .tools li:hover::before {
+            opacity: 1;
+            animation: blink-arrow 0.6s infinite;
+        }
+
+        @keyframes blink-arrow {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .tools a {
+            color: #00ffff;
+            text-decoration: none;
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            text-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
+        }
+
+        .tools a:hover {
+            color: #ffffff;
+            text-shadow: 
+                0 0 10px #00ffff,
+                0 0 20px #00ffff,
+                0 0 30px #00ffff;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: right;
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(0, 255, 255, 0.2);
+            color: #00ffaa;
+            font-size: 0.9rem;
+            opacity: 0.7;
+            letter-spacing: 1px;
+        }
+
+        /* Scanning Line Effect */
+        .scan-line {
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #00ffff, transparent);
+            box-shadow: 0 0 10px #00ffff;
+            animation: scan 4s linear infinite;
             pointer-events: none;
-            background: repeating-linear-gradient(180deg, transparent 0 2px, #39ff1422 2px 4px);
-            opacity: 0.2;
         }
 
-        /* Custom cursor for links */
-        a,
-        .prompt {
-            cursor: url('https://unpkg.com/nes.css@2.3.0/assets/cursor-click.png'), pointer;
+        @keyframes scan {
+            0% { top: 0; opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { top: 100%; opacity: 0; }
         }
 
-        @media (max-width: 800px) {
-            .terminal {
-                max-width: 98vw;
-                padding: 1em;
+        /* Particle Effects */
+        .particle {
+            position: fixed;
+            width: 3px;
+            height: 3px;
+            background: #00ffff;
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: 0;
+            animation: float-particle 8s linear infinite;
+        }
+
+        @keyframes float-particle {
+            0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-100vh) translateX(100px); opacity: 0; }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .portal {
+                padding: 2rem 1.5rem;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .tools li {
+                padding: 0.8rem 1rem;
+            }
+
+            .tools a {
+                font-size: 1rem;
             }
         }
     </style>
 </head>
-
 <body>
-    <canvas id="matrix-bg"></canvas>
-    <div class="terminal">
-        <div class="terminal-header">
-            <span class="dot red"></span>
-            <span class="dot yellow"></span>
-            <span class="dot green"></span>
-            <span class="terminal-title">MewJS // Hacker Portal</span>
-        </div>
-        <h3 id="ascii-art">
-            Make Tools That Will Make Your Life Easier
-        </h3>
-        <h2>Available Tools</h2>
-        <ul class="tools">
-            <li><span class="prompt">$</span><a href="https://burp.ctf.id.vn">BurpSuite Keygen</a></li>
-            <li><span class="prompt">$</span><a href="/json-editor">JSON Editor</a></li>
-            <li><span class="prompt">$</span><a href="/image-compressor">Image Compressor</a></li>
-            <li><span class="prompt">$</span><a href="/string-tools">String Tools</a></li>
-            <li><span class="prompt">$</span><a href="/video">Video Online</a></li>
-            <li><span class="prompt">$</span><a href="/python-playground">Python Playground</a></li>
-            <li><span class="prompt">$</span><a href="/upload">Upload Imgur</a></li>
-            <li><span class="prompt">$</span><a href="/CyberChef">CyberChef</a></li>
-            <li><span class="prompt">$</span><a href="/qrcode">QR Code</a></li>
-            <li><span class="prompt">$</span><a href="/DownGit">DownGit</a></li>
-            <li><span class="prompt">$</span><a href="/reverse-shell-generator">Reverse Shell Generator</a></li>
-            <li><span class="prompt">$</span><a href="/runtime-exec.html">Runtime Exec</a></li>
-            <li><span class="prompt">$</span><a href="https://jb.ctf.id.vn">JetBrains Keygen</a></li>
-        </ul>
-        <div style="margin-top:2em; color:#39ff14; font-size:0.9em; opacity:0.7; text-align:right;">
-            &lt;hacked by ctf.id.vn&gt;
+    <!-- Custom Cursor -->
+    <div id="cursor">
+        <div id="cursor-glow"></div>
+        <div id="cursor-core"></div>
+    </div>
+
+    <!-- Stars Background -->
+    <div class="stars" id="stars"></div>
+
+    <!-- UFO -->
+    <div id="ufo">
+        <div class="ufo-dome"></div>
+        <div class="ufo-body">
+            <div class="ufo-light"></div>
         </div>
     </div>
+
+    <!-- Particles -->
+    <div id="particles"></div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="portal">
+            <div class="corner corner-tl"></div>
+            <div class="corner corner-tr"></div>
+            <div class="corner corner-bl"></div>
+            <div class="corner corner-br"></div>
+            <div class="scan-line"></div>
+
+            <div class="header">
+                <div class="alien-icon">👽</div>
+                <h1>MewJS</h1>
+                <p class="subtitle">// Alien Portal System //</p>
+                <p class="subtitle">Make Tools That Will Make Your Life Easier</p>
+            </div>
+
+            <h2>⚡ Available Tools</h2>
+            <ul class="tools">
+                <li><a href="https://burp.ctf.id.vn">BurpSuite Keygen</a></li>
+                <li><a href="/json-editor">JSON Editor</a></li>
+                <li><a href="/image-compressor">Image Compressor</a></li>
+                <li><a href="/string-tools">String Tools</a></li>
+                <li><a href="/video">Video Online</a></li>
+                <li><a href="/python-playground">Python Playground</a></li>
+                <li><a href="/upload">Upload Imgur</a></li>
+                <li><a href="/CyberChef">CyberChef</a></li>
+                <li><a href="/qrcode">QR Code</a></li>
+                <li><a href="/DownGit">DownGit</a></li>
+                <li><a href="/reverse-shell-generator">Reverse Shell Generator</a></li>
+                <li><a href="/runtime-exec.html">Runtime Exec</a></li>
+                <li><a href="https://jb.ctf.id.vn">JetBrains Keygen</a></li>
+            </ul>
+
+            <div class="footer">
+                &lt; Transmitted from ctf.id.vn &gt;
+            </div>
+        </div>
+    </div>
+
     <script>
-        // Matrix-style binary rain background
-        const canvas = document.getElementById('matrix-bg');
-        const ctx = canvas.getContext('2d');
-        let w = window.innerWidth;
-        let h = window.innerHeight;
-        canvas.width = w;
-        canvas.height = h;
-        let fontSize = 20;
-        let columns = Math.floor(w / fontSize);
-        let drops = Array(columns).fill(1);
-        function drawMatrix() {
-            ctx.fillStyle = 'rgba(0,0,0,0.13)';
-            ctx.fillRect(0, 0, w, h);
-            ctx.font = fontSize + "px 'Fira Mono', monospace";
-            for (let i = 0; i < drops.length; i++) {
-                let text = Math.random() > 0.5 ? '1' : '0';
-                ctx.fillStyle = '#39ff14';
-                ctx.shadowColor = '#39ff14';
-                ctx.shadowBlur = 8;
-                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-                ctx.shadowBlur = 0;
-                if (Math.random() > 0.975) drops[i] = 0;
-                drops[i]++;
-                if (drops[i] * fontSize > h) drops[i] = 0;
-            }
+        // Custom Cursor Follow
+        const cursor = document.getElementById('cursor');
+        let mouseX = 0, mouseY = 0;
+        let cursorX = 0, cursorY = 0;
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
+
+        function animateCursor() {
+            cursorX += (mouseX - cursorX) * 0.15;
+            cursorY += (mouseY - cursorY) * 0.15;
+            cursor.style.left = cursorX + 'px';
+            cursor.style.top = cursorY + 'px';
+            requestAnimationFrame(animateCursor);
         }
-        setInterval(drawMatrix, 50);
-        window.addEventListener('resize', () => {
-            w = window.innerWidth;
-            h = window.innerHeight;
-            canvas.width = w;
-            canvas.height = h;
-            columns = Math.floor(w / fontSize);
-            drops = Array(columns).fill(1);
+        animateCursor();
+
+        // Cursor hover effect
+        const links = document.querySelectorAll('a, .tools li');
+        links.forEach(link => {
+            link.addEventListener('mouseenter', () => {
+                cursor.style.transform = 'scale(1.5)';
+            });
+            link.addEventListener('mouseleave', () => {
+                cursor.style.transform = 'scale(1)';
+            });
         });
 
-        // Make sure canvas stays behind everything
-        canvas.style.position = 'fixed';
-        canvas.style.left = '0';
-        canvas.style.top = '0';
-        canvas.style.width = '100vw';
-        canvas.style.height = '100vh';
-        canvas.style.zIndex = '0';
-
-        // Terminal flicker effect for ascii art
-        // Terminal flicker effect for ascii art
-        const ascii = document.getElementById('ascii-art');
-        function flicker() {
-            if (!ascii) return;
-            ascii.style.opacity = 0.95 + Math.random() * 0.05;
-            ascii.style.textShadow = `0 0 ${8 + Math.random() * 8}px #39ff14cc`;
+        // Generate Stars
+        const starsContainer = document.getElementById('stars');
+        for (let i = 0; i < 200; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            star.style.left = Math.random() * 100 + '%';
+            star.style.top = Math.random() * 100 + '%';
+            star.style.animationDelay = Math.random() * 3 + 's';
+            star.style.animationDuration = (2 + Math.random() * 3) + 's';
+            starsContainer.appendChild(star);
         }
-        setInterval(flicker, 120);
 
-        // Animated prompt typing effect
-        document.querySelectorAll('.tools li').forEach((li, idx) => {
-            const prompt = li.querySelector('.prompt');
-            if (prompt) {
-                prompt.innerHTML = '';
-                let chars = '$';
-                let i = 0;
-                setTimeout(function typePrompt() {
-                    prompt.innerHTML = chars.slice(0, i + 1) + '<span class="cursor-blink">█</span>';
-                    i++;
-                    if (i < chars.length) setTimeout(typePrompt, 80 + Math.random() * 60);
-                    else setTimeout(() => { prompt.innerHTML = '$<span class="cursor-blink">█</span>'; }, 200);
-                }, 200 + idx * 60);
+        // Generate Floating Particles
+        const particlesContainer = document.getElementById('particles');
+        setInterval(() => {
+            if (document.querySelectorAll('.particle').length < 15) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDuration = (6 + Math.random() * 4) + 's';
+                particlesContainer.appendChild(particle);
+                
+                setTimeout(() => {
+                    particle.remove();
+                }, 8000);
             }
-        });
+        }, 800);
 
-        // Blinking cursor effect
-        const style = document.createElement('style');
-        style.innerHTML = `.cursor-blink { display:inline-block; animation: blink-cursor 1s steps(1) infinite; }
-    @keyframes blink-cursor { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }`;
-        document.head.appendChild(style);
-
-        // Mouse trail effect
-        let trail = [];
-        document.addEventListener('mousemove', function (e) {
-            const dot = document.createElement('div');
-            dot.style.position = 'fixed';
-            dot.style.left = (e.clientX - 2) + 'px';
-            dot.style.top = (e.clientY - 2) + 'px';
-            dot.style.width = '6px';
-            dot.style.height = '6px';
-            dot.style.borderRadius = '50%';
-            dot.style.background = '#39ff14';
-            dot.style.opacity = '0.18';
-            dot.style.pointerEvents = 'none';
-            dot.style.zIndex = 9999;
-            document.body.appendChild(dot);
-            trail.push(dot);
-            if (trail.length > 24) {
-                let old = trail.shift();
-                if (old) old.remove();
+        // Glitch Effect on Title
+        const title = document.querySelector('h1');
+        setInterval(() => {
+            if (Math.random() > 0.95) {
+                title.style.textShadow = `
+                    ${Math.random() * 10 - 5}px ${Math.random() * 10 - 5}px 10px #ff00ff,
+                    ${Math.random() * 10 - 5}px ${Math.random() * 10 - 5}px 20px #00ffff
+                `;
+                setTimeout(() => {
+                    title.style.textShadow = `
+                        0 0 10px #00ffff,
+                        0 0 20px #00ffff,
+                        0 0 30px #00ffff,
+                        0 0 40px #00ffff
+                    `;
+                }, 100);
             }
-            setTimeout(() => dot.remove(), 600);
-        });
+        }, 3000);
+
+        // Alien Icon Animation Enhancement
+        const alienIcon = document.querySelector('.alien-icon');
+        setInterval(() => {
+            if (Math.random() > 0.7) {
+                alienIcon.style.filter = 'drop-shadow(0 0 30px #ff00ff) hue-rotate(90deg)';
+                setTimeout(() => {
+                    alienIcon.style.filter = 'drop-shadow(0 0 20px #00ffff)';
+                }, 200);
+            }
+        }, 2000);
+
+        // Portal Glow Pulse
+        const portal = document.querySelector('.portal');
+        let glowIntensity = 40;
+        let glowDirection = 1;
+
+        setInterval(() => {
+            glowIntensity += glowDirection * 2;
+            if (glowIntensity >= 60 || glowIntensity <= 30) {
+                glowDirection *= -1;
+            }
+            portal.style.boxShadow = `
+                0 0 ${glowIntensity}px rgba(0, 255, 255, 0.3),
+                0 0 ${glowIntensity * 2}px rgba(0, 255, 255, 0.2),
+                inset 0 0 60px rgba(0, 255, 255, 0.05)
+            `;
+        }, 100);
     </script>
 </body>
-
 </html>
